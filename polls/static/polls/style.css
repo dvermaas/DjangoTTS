@@ -1,0 +1,58 @@
+html, body { 
+    margin: 0; 
+    padding: 0px; 
+    border: 0px;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+.header {
+    text-align: center;
+    background: white;
+    color: black;
+    font-size: 30px;
+    height: 150px;
+    width: 100%;
+}
+
+.container {
+    height: 100%; width:100%; font-size: 0;
+}
+
+.container_item {
+    display: inline-block; 
+    vertical-align: top; 
+    width: 33.3%; 
+    height: 100%;
+    /*padding-top: 10%;padding-bottom: 10%;*/
+    font-size: 1.25rem; 
+    color: #004785;
+    background-color: red;
+    text-align:center;
+    justify-content: center;
+}
+
+.poll_item {
+    display: inline-block;
+    background-color: #004785;
+    color: white;
+    border-radius: 25px;
+    height: 150px;
+    width : 400px;
+    margin: 50px;
+    text-align: center;
+    vertical-align: center;
+    /*justify-content:center;*/
+    text-decoration: none;
+    cursor: auto;
+    font-size: 27;
+}
+
+.logo {
+    width: 40%; display: flex;
+}
+
+body {
+    background: white url("images/background.png") no-repeat;
+}
