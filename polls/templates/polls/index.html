@@ -5,9 +5,13 @@
 <head>
     <div class="header">
         <div class="container">
-            <div class="container_item"> Verbalisant Feedback </div>
-            <div class="container_item"><img src="../../static/polls/images/logo.svg" alt="Politie logo" class="logo"></div>
-            <div class="container_item"> Bel 112 ofzo!</div>
+            <div class="container_item"><b><span>Verbalisant Feedback</span></b></div>
+            <div class="container_item"><b><span style="font-size: 55px;">BLUEPOLL</span></b> V2.0</div>
+            {% if user.is_authenticated %}
+            <div class="container_item"><b><span><a href="/members/login_user">LOGIN</span></b></div>
+            {% else %}
+            <div class="container_item"><b><span><a href="/members/logout_user">LOGOUT</span></b></div>
+            {% endif %}
         </div>
     </div> 
 </head>
@@ -17,17 +21,11 @@
     <ul>
     {% for question in latest_question_list %}
         <!-- <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> -->
-        <a class="poll_item" href="/polls/{{ question.id }}/">{{ question.question_text }}</a>
+        <a class="poll_item" href="/polls/{{ question.id }}/"><span>{{ question.question_text }}</span></a>
     {% endfor %}
     </ul>
 {% else %}
     <p>No polls are available.</p>
 {% endif %}
-
-<ul>
-    <a class="poll_item" href="#home">What do you think about this website?</a>
-    <a class="poll_item" href="#home">What do you think about this website?</a>
-</ul>
-
 
 </body>

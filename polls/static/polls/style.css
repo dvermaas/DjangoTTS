@@ -1,3 +1,8 @@
+@font-face {
+    font-family: PolitieSans;
+    src: url(fonts/politiesans-regular-v13-web.woff2);
+}
+
 html, body { 
     margin: 0; 
     padding: 0px; 
@@ -5,13 +10,12 @@ html, body {
     font-size: 100%;
     font: inherit;
     vertical-align: baseline;
+    font-family: PolitieSans,Arial,sans-serif;
 }
 
 .header {
     text-align: center;
-    background: white;
-    color: black;
-    font-size: 30px;
+    background: #004785;
     height: 150px;
     width: 100%;
 }
@@ -26,9 +30,9 @@ html, body {
     width: 33.3%; 
     height: 100%;
     /*padding-top: 10%;padding-bottom: 10%;*/
-    font-size: 1.25rem; 
-    color: #004785;
-    background-color: red;
+    font-size: 1.5rem; 
+    color: white;
+    /*background-color: red;*/
     text-align:center;
     justify-content: center;
 }
@@ -38,8 +42,8 @@ html, body {
     background-color: #004785;
     color: white;
     border-radius: 25px;
-    height: 150px;
-    width : 400px;
+    height: 187px;
+    width : 500px;
     margin: 50px;
     text-align: center;
     vertical-align: center;
@@ -49,10 +53,17 @@ html, body {
     font-size: 27;
 }
 
+span {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+}
+
 .logo {
-    width: 40%; display: flex;
+    width: 60%; display: flex;
 }
 
 body {
-    background: white url("images/background.png") no-repeat;
+    /*background: white url("images/background.png") no-repeat;*/
+    background-color: #121212;
 }
