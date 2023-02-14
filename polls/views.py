@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from .models import Choice, Question, Vote
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from django. contrib import messages
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -57,14 +58,12 @@ def vote(request, question_id):
             'error_message': "You didn't select a choice.",
         })
     else:
-        #selected_choice.votes += 1
-        #selected_choice.save()
-        #question.voters.add(Vote.objects.create(question=question, user=request.user, choice=selected_choice, voted_at=timezone.now()))
-        vote = Vote(question=question, user=request.user, choice=selected_choice, voted_at=timezone.now())
-        vote.save()
-        #choice = Choice.objects.get(id=selected_choice.id)
-        #choice.votes += 1
-        #choice.save()
+        if question.can_user_vote(request.user):
+            vote = Vote(question=question, user=request.user, choice=selected_choice, voted_at=timezone.now())
+            vote.save()
+        else:
+            messages.success(request, ("Nice try, but you already voted!"))
+            return redirect("polls:index")
 
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a

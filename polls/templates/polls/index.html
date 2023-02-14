@@ -6,7 +6,7 @@
     <div class="header">
         <div class="container">
             <div class="container_item"><b><span>Verbalisant Feedback</span></b></div>
-            <div class="container_item"><b><span style="font-size: 55px;"><a href="polls:index">BLUEPOLL</a></span></b> V2.0</div>
+            <div class="container_item"><b><span style="font-size: 55px;"><a href="{% url 'polls:index' %}">BLUEPOLL</a></span></b> V2.0</div>
             {% if user.is_authenticated %}
             <div class="container_item"><b><span><a href="/members/logout_user">LOGOUT</a></span></b></div>
             {% else %}
@@ -17,6 +17,16 @@
 </head>
 
 <body>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+    {% endfor %}
+{% endif %}
+
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
