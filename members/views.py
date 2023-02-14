@@ -11,12 +11,12 @@ def login_user(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        redirect("home")
+        return redirect("polls:")
     else:
         messages.success(request, ("Incorrect username and/or password :("))
         return redirect("login")
 
 def logout_user(request):
     logout(request)
-    messages.success(request, ("Logout Successfull"))
-    return redirect("home")
+    #messages.success(request, ("Logout Successfull"))
+    return redirect("polls:")

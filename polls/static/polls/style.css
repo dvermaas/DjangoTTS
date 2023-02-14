@@ -11,6 +11,16 @@ html, body {
     font: inherit;
     vertical-align: baseline;
     font-family: PolitieSans,Arial,sans-serif;
+    color: white;
+}
+
+.ghost { 
+    opacity: 0.0;
+}
+
+a {
+    color: white;
+    text-decoration: none;
 }
 
 .header {
