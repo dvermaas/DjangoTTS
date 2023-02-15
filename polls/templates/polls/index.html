@@ -34,7 +34,7 @@
     {% if latest_sequence_list %}
         <ul>
         {% for sequence in latest_sequence_list %}
-            <a class="poll_item" href="/polls/{{ sequence.id }}/"><span class="center">{{ sequence.sequence_text }}</span></a>
+            <a class="poll_item" href="/polls/{{ sequence.question_set.first.id }}/"><span class="center">{{ sequence.sequence_text }}</span></a>
         {% endfor %}
         </ul>
     {% else %}
