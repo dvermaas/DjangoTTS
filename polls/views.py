@@ -71,4 +71,10 @@ def vote(request, question_id):
 
         vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
         vote.save()
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        #return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        sequence_list = list(question.sequence.question_set.all())
+        sequence_next_index = sequence_list.index(question) + 1
+        if sequence_next_index < len(sequence_list):
+            return detail(request, sequence_list[sequence_next_index].id)
+        else:
+            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))

@@ -31,7 +31,8 @@
             </div> 
         {% endfor %}
     {% endif %}
-    
+
+    <!-- <form action="{% url 'polls:vote' question.id %}" method="post"> -->
     <form action="{% url 'polls:vote' question.id %}" method="post">
         {% csrf_token %}
         <fieldset>
@@ -45,6 +46,6 @@
             {% endfor %}
         </fieldset>
         <input type="submit" value="Vote">
-        </form>
+    </form>
 
 </body>
