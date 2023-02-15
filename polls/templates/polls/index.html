@@ -21,27 +21,35 @@
 </head>
 
 <body>
+    {% if messages %}
+        {% for message in messages %} 
+            <div class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+            {{ message }}
+            </div> 
+        {% endfor %}
+    {% endif %}
 
-{% if messages %}
-    {% for message in messages %} 
-        <div class="alert">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-        {{ message }}
-        </div> 
-    {% endfor %}
-{% endif %}
+    <h1 style="width:100%;text-align: center;"><span>Sequence{{ latest_sequence_list.count |pluralize }}:</span></h1>
+    {% if latest_sequence_list %}
+        <ul>
+        {% for sequence in latest_sequence_list %}
+            <a class="poll_item" href="/polls/{{ sequence.id }}/"><span class="center">{{ sequence.sequence_text }}</span></a>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="width:100%;text-align: center;">No polls are available.</p>
+    {% endif %}
 
-
-
-{% if latest_question_list %}
-    <ul>
-    {% for question in latest_question_list %}
-        <!-- <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li> -->
-        <a class="poll_item" href="/polls/{{ question.id }}/"><span class="center">{{ question.question_text }}</span></a>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
+    <h1 style="width:100%;text-align: center;"><span>Poll{{ latest_question_list.count |pluralize }}:</span></h1>
+    {% if latest_question_list %}
+        <ul>
+        {% for question in latest_question_list %}
+            <a class="poll_item" href="/polls/{{ question.id }}/"><span class="center">{{ question.question_text }}</span></a>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="width:100%;text-align: center;">No polls are available.</p>
+    {% endif %}
 
 </body>

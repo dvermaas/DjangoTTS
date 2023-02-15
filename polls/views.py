@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
-from .models import Choice, Question, Vote
+from .models import Choice, Question, Vote, Sequence
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
@@ -16,9 +16,12 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context['latest_sequence_list'] = Sequence.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
+        return context
 
 class DetailView(generic.DetailView):
     model = Question
@@ -36,7 +39,8 @@ class ResultsView(generic.DetailView):
 
 def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list}
+    latest_sequence_list = Question.objects.order_by('-pub_date')[:5]
+    context = {'latest_question_list': latest_question_list, 'latest_sequence_list': latest_sequence_list}
     return render(request, 'polls/index.html', context)
 
 def detail(request, question_id):
@@ -58,14 +62,13 @@ def vote(request, question_id):
             'error_message': "You didn't select a choice.",
         })
     else:
-        if question.can_user_vote(request.user):
-            vote = Vote(question=question, user=request.user, choice=selected_choice, voted_at=timezone.now())
-            vote.save()
-        else:
+        if not request.user.is_authenticated:
+            messages.success(request, ("You can only vote after logging in!"))
+            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        if not question.can_user_vote(request.user):
             messages.success(request, ("Nice try, but you already voted!"))
             return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
+        vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
+        vote.save()
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))

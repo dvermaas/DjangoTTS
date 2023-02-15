@@ -1,16 +1,25 @@
 import datetime
-
+from django.utils import timezone
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
 class Sequence(models.Model):
-    pass
+    sequence_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField("date published", default=timezone.now)
+
+    def __str__(self):
+        return self.sequence_text
+
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField("date published", default=timezone.now)
     voters = models.ManyToManyField(User, through="Vote")
+    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.question_text
@@ -45,10 +54,13 @@ class Choice(models.Model):
         return self.vote_set.count()
         
     def __str__(self):
-        return self.choice_text
+        return f"{self.question} | {self.choice_text}"
 
 class Vote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
-    voted_at = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField("date published", default=timezone.now)
+
+    def __str__(self):
+        return f"<{self.user}> voted <{self.choice.choice_text}> on <{self.question.question_text}>"
