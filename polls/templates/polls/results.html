@@ -30,12 +30,14 @@
         {% endfor %}
     {% endif %}
 
-    <h1>{{ question.question_text }}</h1>
-    <ul>
-    {% for choice in question.choice_set.all %}
-        <li>{{ choice.choice_text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
+    {% for question in sequence.question_set.all %}
+        <h1>{{ question.question_text }}</h1>
+        <ul>
+        {% for choice in question.choice_set.all %}
+            <li>{{ choice.choice_text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
+        {% endfor %}
+        </ul>
     {% endfor %}
-    </ul>
 
     <!-- <li> Total votes: {{question.total_votes}}</li> -->
     <br>
