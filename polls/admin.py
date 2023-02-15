@@ -18,4 +18,4 @@ class QuestionAdmin(admin.ModelAdmin):
 admin.site.register(Question, QuestionAdmin)
 
 #admin.site.register(Choice)
-#admin.site.register(Vote)
+admin.site.register(Vote)

@@ -63,7 +63,7 @@ def vote(request, question_id):
             vote.save()
         else:
             messages.success(request, ("Nice try, but you already voted!"))
-            return redirect("polls:index")
+            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
 
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
