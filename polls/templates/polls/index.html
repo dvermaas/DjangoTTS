@@ -30,7 +30,23 @@
         {% endfor %}
     {% endif %}
 
-    <h1 style="width:100%;text-align: center;"><span>Sequence{{ latest_sequence_list.count |pluralize }}:</span></h1>
+    <h1 style="width:100%;text-align: center;"><span>Enquete{{ latest_sequence_list.count |pluralize }}:</span></h1>
+    {% if latest_sequence_list %}
+        <ul>
+        {% for sequence in sequence_pending_list %}
+            <a class="poll_item" href="/polls/{{ sequence.question_set.first.id }}/"><span class="center">{{ sequence.sequence_text }}</span></a>
+        {% endfor %}
+
+        {% for sequence in sequence_done_list %}
+            <a class="poll_item" href="/polls/{{ sequence.question_set.first.id }}/" style="background-color:#007886"><span class="center">{{ sequence.sequence_text }}</span></a>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="width:100%;text-align: center;">No enquetes are available.</p>
+    {% endif %}
+
+    <!--
+    <h1 style="width:100%;text-align: center;"><span>Enquete{{ latest_sequence_list.count |pluralize }}:</span></h1>
     {% if latest_sequence_list %}
         <ul>
         {% for sequence in latest_sequence_list %}
@@ -38,7 +54,7 @@
         {% endfor %}
         </ul>
     {% else %}
-        <p style="width:100%;text-align: center;">No polls are available.</p>
+        <p style="width:100%;text-align: center;">No enquetes are available.</p>
     {% endif %}
 
     <h1 style="width:100%;text-align: center;"><span>Poll{{ latest_question_list.count |pluralize }}:</span></h1>
@@ -51,5 +67,6 @@
     {% else %}
         <p style="width:100%;text-align: center;">No polls are available.</p>
     {% endif %}
+    -->
 
 </body>

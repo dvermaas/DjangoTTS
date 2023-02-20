@@ -14,6 +14,7 @@ def login_user(request):
         return redirect("polls:index")
     else:
         messages.success(request, ("Incorrect username and/or password :("))
+        # messages.warning/error
         return redirect("login")
 
 def logout_user(request):

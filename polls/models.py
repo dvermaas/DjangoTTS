@@ -11,9 +11,19 @@ class Sequence(models.Model):
     def __str__(self):
         return self.sequence_text
 
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+    def is_done(self, user):
+        if self.get_first_relevant_question(user) == False:
+            return True
+        return False
+        
+    def questions_list(self):
+        return list(self.question_set.all())
+
+    def get_first_relevant_question(self, user):
+        for question in self.question_set.all():
+            if question.can_user_vote(user):
+                return question
+        return False
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
@@ -34,10 +44,9 @@ class Question(models.Model):
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
     def votes_list(self):
-        return [choice.votes for choice in self.choice_set.all()]
+        return [choice.get_vote_count for choice in self.choice_set.all()]
 
     def total_votes(self):
-        return 0
         return sum(self.votes_list())
     
     was_published_recently.admin_order_field = 'pub_date'

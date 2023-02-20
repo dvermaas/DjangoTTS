@@ -38,14 +38,27 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    latest_sequence_list = Question.objects.order_by('-pub_date')[:5]
-    context = {'latest_question_list': latest_question_list, 'latest_sequence_list': latest_sequence_list}
+    latest_question_list = Question.objects.order_by('-pub_date')#[:5]  
+    latest_sequence_list = Sequence.objects.order_by('-pub_date')#[:5] 
+    sequence_pending_list, sequence_done_list = [], []
+    for sequence in latest_sequence_list:
+        if sequence.is_done(request.user):
+            sequence_done_list.append(sequence)
+        else:
+            sequence_pending_list.append(sequence)
+    
+    context = {"latest_question_list": latest_question_list,
+               "latest_sequence_list": latest_sequence_list, 
+               "sequence_pending_list": sequence_pending_list,
+               "sequence_done_list": sequence_done_list}
     return render(request, 'polls/index.html', context)
 
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/detail.html', {'question': question})
+    next_question = question.sequence.get_first_relevant_question(request.user)
+    if next_question == False:
+        return HttpResponseRedirect(reverse('polls:results', args=(question.sequence.id,)))
+    return render(request, 'polls/detail.html', {'question': next_question})
 
 def results(request, sequence_id):
     sequence = get_object_or_404(Question, pk=sequence_id)
@@ -64,16 +77,21 @@ def vote(request, question_id):
     else:
         if not request.user.is_authenticated:
             messages.success(request, ("You can only vote after logging in!"))
-            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
-        if not question.can_user_vote(request.user):
+        elif not question.can_user_vote(request.user):
             messages.success(request, ("Nice try, but you already voted!"))
-            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
-
-        vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
-        vote.save()
-        sequence_list = list(question.sequence.question_set.all())
-        sequence_next_index = sequence_list.index(question) + 1
-        if sequence_next_index < len(sequence_list):
-            return detail(request, sequence_list[sequence_next_index].id)
+        else:
+            vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
+            vote.save()
+        
+        #sequence_question_list = list(question.sequence.question_set.all())
+        #sequence_next_index = sequence_question_list.index(question) + 1
+        #if sequence_next_index < len(sequence_question_list):
+        #    return HttpResponseRedirect(reverse('polls:detail', args=(sequence_question_list[sequence_next_index].id,)))
+        #else:
+        #    return HttpResponseRedirect(reverse('polls:results', args=(question.sequence.id,)))
+        
+        next_question = question.sequence.get_first_relevant_question(request.user)
+        if next_question:
+            return HttpResponseRedirect(reverse('polls:detail', args=(next_question.id,)))
         else:
             return HttpResponseRedirect(reverse('polls:results', args=(question.sequence.id,)))

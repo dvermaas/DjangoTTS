@@ -37,9 +37,9 @@
             <li>{{ choice.choice_text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
         {% endfor %}
         </ul>
+        <li> Total votes: {{question.total_votes}}</li>
     {% endfor %}
-
-    <!-- <li> Total votes: {{question.total_votes}}</li> -->
+    
     <br>
     <a href="{% url 'polls:index'%}">Return to homepage?</a>
 </body>
