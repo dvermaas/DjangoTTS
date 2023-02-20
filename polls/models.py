@@ -4,6 +4,10 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import send_mail
+
 class Sequence(models.Model):
     sequence_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField("date published", default=timezone.now)
@@ -24,6 +28,19 @@ class Sequence(models.Model):
             if question.can_user_vote(user):
                 return question
         return False
+
+@receiver(post_save, sender=Sequence)
+def send_mail_to_subs(sender, instance, created, **kwargs):
+    if not created:
+        return
+        
+    for user in User.objects.all():
+        send_mail(
+            f"New Post {instance.sequence_text}",
+            f"Hello {user}",
+            f"djangopolls@gmail.com",
+            [user.email],
+        )
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
