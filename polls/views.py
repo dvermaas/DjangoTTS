@@ -38,14 +38,15 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')#[:5]  
-    latest_sequence_list = Sequence.objects.order_by('-pub_date')#[:5] 
+    latest_question_list = Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date') 
+    latest_sequence_list = Sequence.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')
     sequence_pending_list, sequence_done_list = [], []
-    for sequence in latest_sequence_list:
-        if sequence.is_done(request.user):
-            sequence_done_list.append(sequence)
-        else:
-            sequence_pending_list.append(sequence)
+    if request.user.is_authenticated:
+        for sequence in latest_sequence_list:
+            if sequence.is_done(request.user):
+                sequence_done_list.append(sequence)
+            else:
+                sequence_pending_list.append(sequence)
     
     context = {"latest_question_list": latest_question_list,
                "latest_sequence_list": latest_sequence_list, 
@@ -82,13 +83,6 @@ def vote(request, question_id):
         else:
             vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
             vote.save()
-        
-        #sequence_question_list = list(question.sequence.question_set.all())
-        #sequence_next_index = sequence_question_list.index(question) + 1
-        #if sequence_next_index < len(sequence_question_list):
-        #    return HttpResponseRedirect(reverse('polls:detail', args=(sequence_question_list[sequence_next_index].id,)))
-        #else:
-        #    return HttpResponseRedirect(reverse('polls:results', args=(question.sequence.id,)))
         
         next_question = question.sequence.get_first_relevant_question(request.user)
         if next_question:

@@ -20,14 +20,19 @@ class Sequence(models.Model):
             return True
         return False
         
-    def questions_list(self):
-        return list(self.question_set.all())
+    def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
     def get_first_relevant_question(self, user):
         for question in self.question_set.all():
             if question.can_user_vote(user):
                 return question
         return False
+
+    was_published_recently.admin_order_field = 'pub_date'
+    was_published_recently.boolean = True
+    was_published_recently.short_description = 'Published recently?'
 
 @receiver(post_save, sender=Sequence)
 def send_mail_to_subs(sender, instance, created, **kwargs):
@@ -37,7 +42,7 @@ def send_mail_to_subs(sender, instance, created, **kwargs):
     for user in User.objects.all():
         send_mail(
             f"New Post {instance.sequence_text}",
-            f"Hello {user}",
+            f"Hello {user},<br> there is a new enquete available! <br><br> {instance.sequence_text}",
             f"djangopolls@gmail.com",
             [user.email],
         )
@@ -56,20 +61,11 @@ class Question(models.Model):
         qs = user_votes.filter(question=self)
         return not(qs.exists())
 
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
-
     def votes_list(self):
         return [choice.get_vote_count for choice in self.choice_set.all()]
 
     def total_votes(self):
         return sum(self.votes_list())
-    
-    was_published_recently.admin_order_field = 'pub_date'
-    was_published_recently.boolean = True
-    was_published_recently.short_description = 'Published recently?'
-
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
