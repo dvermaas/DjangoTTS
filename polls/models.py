@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 
 class Sequence(models.Model):
     sequence_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField("date published", default=timezone.now)
+    pub_date = models.DateTimeField("date published", default=timezone.now, help_text="wanneer enquete word weergegeven")
 
     def __str__(self):
         return self.sequence_text
@@ -42,7 +42,7 @@ def send_mail_to_subs(sender, instance, created, **kwargs):
     for user in User.objects.all():
         send_mail(
             f"New Post {instance.sequence_text}",
-            f"Hello {user},<br> there is a new enquete available! <br><br> {instance.sequence_text}",
+            f"Hello {user}, there is a new enquete available!",
             f"djangopolls@gmail.com",
             [user.email],
         )

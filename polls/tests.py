@@ -77,6 +77,15 @@ class SequenceIndexViewTests(TestCase):
             [sequence2, sequence1],
         )
 
+    def test_pending_sequence(self):
+        sequence1 = create_sequence(days=-30)
+        question1 = create_question(sequence1, days=-30)
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(
+            response.context['sequence_done_list'],
+            [sequence1],
+        )
+
 class QuestionDetailViewTests(TestCase):
     pass
      
