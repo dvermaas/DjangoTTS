@@ -8,12 +8,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 
-class Sequence(models.Model):
-    sequence_text = models.CharField(max_length=200)
+class Enquete(models.Model):
+    text = models.CharField(max_length=200)
     pub_date = models.DateTimeField("date published", default=timezone.now, help_text="wanneer enquete word weergegeven")
 
     def __str__(self):
-        return self.sequence_text
+        return self.text
 
     def is_done(self, user):
         if self.get_first_relevant_question(user) == False:
@@ -34,27 +34,26 @@ class Sequence(models.Model):
     was_published_recently.boolean = True
     was_published_recently.short_description = 'Published recently?'
 
-@receiver(post_save, sender=Sequence)
+@receiver(post_save, sender=Enquete)
 def send_mail_to_subs(sender, instance, created, **kwargs):
     if not created:
         return
         
     for user in User.objects.all():
         send_mail(
-            f"New Post {instance.sequence_text}",
+            f"New Post {instance.text}",
             f"Hello {user}, there is a new enquete available!",
             f"djangopolls@gmail.com",
             [user.email],
         )
 
 class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField("date published", default=timezone.now)
+    text = models.CharField(max_length=200)
     voters = models.ManyToManyField(User, through="Vote")
-    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
+    enquete = models.ForeignKey(Enquete, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.question_text
+        return self.text
 
     def can_user_vote(self, user):
         user_votes = user.vote_set.all()
@@ -69,14 +68,14 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
+    text = models.CharField(max_length=200)
 
     @property
     def get_vote_count(self):
         return self.vote_set.count()
         
     def __str__(self):
-        return f"{self.question} | {self.choice_text}"
+        return f"{self.question} | {self.text}"
 
 class Vote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -85,4 +84,4 @@ class Vote(models.Model):
     pub_date = models.DateTimeField("date published", default=timezone.now)
 
     def __str__(self):
-        return f"<{self.user}> voted <{self.choice.choice_text}> on <{self.question.question_text}>"
+        return f"<{self.user}> voted <{self.choice.text}> on <{self.question.text}>"

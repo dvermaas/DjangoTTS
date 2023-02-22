@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Sequence, Question, Choice, Vote
+from .models import Enquete, Question, Choice, Vote
 
 
 class QuestionInline(admin.StackedInline):
@@ -10,22 +10,21 @@ class ChoiceInline(admin.StackedInline):
     model = Choice
     extra = 0
 
-class SequenceAdmin(admin.ModelAdmin):
+class EnqueteAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['sequence_text']}),
+        (None,               {'fields': ['text']}),
         ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
     ]
     inlines = [QuestionInline]
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['question_text', 'sequence']}),
-        ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+        (None,               {'fields': ['text', 'enquete']}),
     ]
     inlines = [ChoiceInline]
 
 
 
-admin.site.register(Sequence, SequenceAdmin)
+admin.site.register(Enquete, EnqueteAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice)
 admin.site.register(Vote)

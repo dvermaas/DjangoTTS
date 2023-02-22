@@ -30,11 +30,11 @@
         {% endfor %}
     {% endif %}
 
-    {% for question in sequence.question_set.all %}
-        <h1>{{ question.question_text }}</h1>
+    {% for question in enquete.question_set.all %}
+        <h1>{{ question.text }}</h1>
         <ul>
         {% for choice in question.choice_set.all %}
-            <li>{{ choice.choice_text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
+            <li>{{ choice.text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
         {% endfor %}
         </ul>
         <li> Total votes: {{question.total_votes}}</li>
