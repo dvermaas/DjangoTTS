@@ -1,71 +1,18 @@
-{% load static %}
 
-<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+{% extends "polls/base.html" %}
 
-<head>
-    <div class="header">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center">Hey {{user}}!</span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center">Welcome stranger!</span></b></div>
-            {% endif %}
-            <div class="container_item"><b><span class="center" style="font-size: 55px;"><a href="{% url 'polls:index' %}">BLUEPOLL</a></span></b> V2.0</div>
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center"><a href="/members/logout_user">LOGOUT</a></span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center"><a href="/members/login_user">LOGIN</a></span></b></div>
-            {% endif %}
-        </div>
-    </div> 
-</head>
+{% block content %}
+{% if latest_enquete_list %}
+    <ul>
+    {% for enquete in enquete_pending_list %}
+        <a class="poll_item" href="/polls/{{ enquete.question_set.first.id }}/"><span class="center">{{ enquete.text }}</span></a>
+    {% endfor %}
 
-<body>
-    {% if messages %}
-        {% for message in messages %} 
-            <div class="alert">
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-            {{ message }}
-            </div> 
-        {% endfor %}
-    {% endif %}
-
-    {% if latest_enquete_list %}
-        <ul>
-        {% for enquete in enquete_pending_list %}
-            <a class="poll_item" href="/polls/{{ enquete.question_set.first.id }}/"><span class="center">{{ enquete.text }}</span></a>
-        {% endfor %}
-
-        {% for enquete in enquete_done_list %}
-            <a class="poll_item" href="/polls/{{ enquete.question_set.first.id }}/" style="background-color:#007886"><span class="center">{{ enquete.text }}</span></a>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p style="width:100%;text-align: center;">No enquetes are available.</p>
-    {% endif %}
-
-    <!--
-    <h1 style="width:100%;text-align: center;"><span>Enquete{{ latest_enquete_list.count |pluralize }}:</span></h1>
-    {% if latest_enquete_list %}
-        <ul>
-        {% for enquete in latest_enquete_list %}
-            <a class="poll_item" href="/polls/{{ enquete.question_set.first.id }}/"><span class="center">{{ enquete.text }}</span></a>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p style="width:100%;text-align: center;">No enquetes are available.</p>
-    {% endif %}
-
-    <h1 style="width:100%;text-align: center;"><span>Poll{{ latest_question_list.count |pluralize }}:</span></h1>
-    {% if latest_question_list %}
-        <ul>
-        {% for question in latest_question_list %}
-            <a class="poll_item" href="/polls/{{ question.id }}/"><span class="center">{{ question.text }}</span></a>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p style="width:100%;text-align: center;">No polls are available.</p>
-    {% endif %}
-    -->
-
-</body>
+    {% for enquete in enquete_done_list %}
+        <a class="poll_item" href="/polls/{{ enquete.question_set.first.id }}/" style="background-color:#007886"><span class="center">{{ enquete.text }}</span></a>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p style="width:100%;text-align: center;">No enquetes are available.</p>
+{% endif %}
+{% endblock %}

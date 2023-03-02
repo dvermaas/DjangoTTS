@@ -139,9 +139,9 @@ class QuestionDetailViewTests(TestCase):
         """
         enquete = create_enquete(days=-30)
         question1 = create_question(enquete)
-        choice1 = create_choice(question1)
+        create_choice(question1)
         question2 = create_question(enquete)
-        choice2 = create_choice(question2)
+        create_choice(question2)
         self.assertEqual(enquete.get_first_relevant_question(self.user), question1)
 
     def test_first_relevant_question_second(self):
@@ -151,11 +151,12 @@ class QuestionDetailViewTests(TestCase):
         enquete = create_enquete(days=-30)
         question1 = create_question(enquete)
         choice1 = create_choice(question1)
-        create_vote(question1, self.user, choice1)
         question2 = create_question(enquete)
-        choice2 = create_choice(question2)
-        self.assertEqual(enquete.get_first_relevant_question(self.user), question2)
+        create_choice(question2)
 
+        create_vote(question1, self.user, choice1)
+        self.assertEqual(enquete.get_first_relevant_question(self.user), question2)
+        
     def test_first_relevant_question_none(self):
         """
         Check if get_first_relevant_question() returns False if all questions are answered
@@ -163,12 +164,13 @@ class QuestionDetailViewTests(TestCase):
         enquete = create_enquete(days=-30)
         question1 = create_question(enquete)
         choice1 = create_choice(question1)
-        create_vote(question1, self.user, choice1)
         question2 = create_question(enquete)
         choice2 = create_choice(question2)
         create_vote(question2, self.user, choice2)
+
+        create_vote(question1, self.user, choice1)
         self.assertEqual(enquete.get_first_relevant_question(self.user), False)
-     
+
 class EnqueteModelTests(TestCase):
 
     def test_was_published_recently_with_future_enquete(self):

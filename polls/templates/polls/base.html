@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BLUEPOLL</title>
+    <link rel="icon" href="../../static/polls/images/small_logo.png">
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            {% if user.is_authenticated %}
+            <div class="container_item"><b><span class="center">Hey {{user}}!</span></b></div>
+            {% else %}
+            <div class="container_item"><b><span class="center">Welcome stranger!</span></b></div>
+            {% endif %}
+            <div class="container_item"><b><span class="center" style="font-size: 55px;"><a href="{% url 'polls:index' %}">BLUEPOLL</a></span></b> V2.0</div>
+            {% if user.is_authenticated %}
+            <div class="container_item"><b><span class="center"><a href="/members/logout_user">LOGOUT</a></span></b></div>
+            {% else %}
+            <div class="container_item"><b><span class="center"><a href="/members/login_user">LOGIN</a></span></b></div>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %} 
+            {% if message.tags == 'success' %}
+                <div class="alert" style="background-color: #2cb82c;"><span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>{{ message }}</div>
+            {% else %}
+                <div class="alert" style="background-color: #f14236;"><span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

@@ -7,6 +7,8 @@ from django.views import generic
 from django.utils import timezone
 from django. contrib import messages
 
+from django.db.models import Count, Q
+
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
     context_object_name = 'latest_question_list'
@@ -55,7 +57,7 @@ def index(request):
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     next_question = question.enquete.get_first_relevant_question(request.user)
-    if next_question == False:
+    if next_question is None:
         return HttpResponseRedirect(reverse('polls:results', args=(question.enquete.id,)))
     return render(request, 'polls/detail.html', {'question': next_question})
 
@@ -79,7 +81,7 @@ def vote(request, question_id):
         elif not question.can_user_vote(request.user):
             messages.success(request, ("Nice try, but you already voted!"))
         else:
-            vote = Vote(question=question, user=request.user, choice=selected_choice, pub_date=timezone.now())
+            vote = Vote(question=question, user=request.user, choice=selected_choice)
             vote.save()
         
         next_question = question.enquete.get_first_relevant_question(request.user)

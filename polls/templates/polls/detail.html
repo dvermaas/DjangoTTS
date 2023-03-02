@@ -1,51 +1,18 @@
+{% extends "polls/base.html" %}
 
-
-{% load static %}
-
-<link rel="stylesheet" href="{% static 'polls/style.css' %}">
-
-<head>
-    <div class="header">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center">Hey {{user}}!</span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center">Welcome stranger!</span></b></div>
-            {% endif %}
-            <div class="container_item"><b><span class="center" style="font-size: 55px;"><a href="{% url 'polls:index' %}">BLUEPOLL</a></span></b> V2.0</div>
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center"><a href="/members/logout_user">LOGOUT</a></span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center"><a href="/members/login_user">LOGIN</a></span></b></div>
-            {% endif %}
-        </div>
-    </div> 
-</head>
-
-<body>
-    {% if messages %}
-        {% for message in messages %} 
-            <div class="alert">
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-            {{ message }}
-            </div> 
+{% block content %}
+<form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend><h1>{{ question.text }}</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            <!-- <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> -->
+            <!--<label for="choice{{ forloop.counter }}">{{ choice.text }}</label><br>  -->
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> 
+            <input type="button" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.text }}" class="poll_item">
         {% endfor %}
-    {% endif %}
-
-    <!-- <form action="{% url 'polls:vote' question.id %}" method="post"> -->
-    <form action="{% url 'polls:vote' question.id %}" method="post">
-        {% csrf_token %}
-        <fieldset>
-            <legend><h1>{{ question.text }}</h1></legend>
-            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-            {% for choice in question.choice_set.all %}
-                <!-- <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> -->
-                <!--<label for="choice{{ forloop.counter }}">{{ choice.text }}</label><br>  -->
-                <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}"> 
-                <input type="button" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.text }}" class="poll_item">
-            {% endfor %}
-        </fieldset>
-        <input type="submit" value="Vote">
-    </form>
-
-</body>
+    </fieldset>
+    <input type="submit" value="Vote">
+</form>
+{% endblock %}

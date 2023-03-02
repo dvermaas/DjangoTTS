@@ -1,45 +1,13 @@
-{% load static %}
+{% extends "polls/base.html" %}
 
-<link rel="stylesheet" href="{% static 'polls/style.css' %}">
-
-<head>
-    <div class="header">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center">Hey {{user}}!</span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center">Welcome stranger!</span></b></div>
-            {% endif %}
-            <div class="container_item"><b><span class="center" style="font-size: 55px;"><a href="{% url 'polls:index' %}">BLUEPOLL</a></span></b> V2.0</div>
-            {% if user.is_authenticated %}
-            <div class="container_item"><b><span class="center"><a href="/members/logout_user">LOGOUT</a></span></b></div>
-            {% else %}
-            <div class="container_item"><b><span class="center"><a href="/members/login_user">LOGIN</a></span></b></div>
-            {% endif %}
-        </div>
-    </div> 
-</head>
-
-<body>
-    {% if messages %}
-        {% for message in messages %} 
-            <div class="alert">
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
-            {{ message }}
-            </div> 
-        {% endfor %}
-    {% endif %}
-
-    {% for question in enquete.question_set.all %}
-        <h1>{{ question.text }}</h1>
-        <ul>
-        {% for choice in question.choice_set.all %}
-            <li>{{ choice.text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
-        {% endfor %}
-        </ul>
-        <li> Total votes: {{question.total_votes}}</li>
+{% block content %}
+{% for question in enquete.question_set.all %}
+    <h1>{{ question.text }}</h1>
+    <ul>
+    {% for choice in question.choice_set.all %}
+        <li>{{ choice.text }}: {{ choice.get_vote_count }} vote{{ choice.get_vote_count |pluralize }}</li>
     {% endfor %}
-    
-    <br>
-    <a href="{% url 'polls:index'%}">Return to homepage?</a>
-</body>
+    </ul>
+    <li> Total votes: {{question.total_votes}}</li>
+{% endfor %}
+{% endblock %}

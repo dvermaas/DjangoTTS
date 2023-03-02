@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
+from django.template.loader import render_to_string
 
 class Enquete(models.Model):
     text = models.CharField(max_length=200)
@@ -16,9 +17,7 @@ class Enquete(models.Model):
         return self.text
 
     def is_done(self, user):
-        if self.get_first_relevant_question(user) == False:
-            return True
-        return False
+        return self.get_first_relevant_question(user) is None
         
     def was_published_recently(self):
         now = timezone.now()
@@ -28,7 +27,7 @@ class Enquete(models.Model):
         for question in self.question_set.all():
             if question.can_user_vote(user):
                 return question
-        return False
+        return None
 
     was_published_recently.admin_order_field = 'pub_date'
     was_published_recently.boolean = True
@@ -38,14 +37,17 @@ class Enquete(models.Model):
 def send_mail_to_subs(sender, instance, created, **kwargs):
     if not created:
         return
-        
+
     for user in User.objects.all():
-        send_mail(
-            f"New Post {instance.text}",
-            f"Hello {user}, there is a new enquete available!",
-            f"djangopolls@gmail.com",
-            [user.email],
+        html_message = render_to_string('polls/email.html', {'recipient_name': user.username, 'poll_name': instance.text})
+        email = EmailMessage(
+            subject="New Poll Available!",
+            body=html_message,
+            from_email='myemail@example.com',
+            to=[user.email],
         )
+        email.content_subtype = 'html'
+        email.send()
 
 class Question(models.Model):
     text = models.CharField(max_length=200)
