@@ -5,9 +5,10 @@ from .models import Choice, Question, Vote, Enquete
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
-from django. contrib import messages
+from django.contrib import messages
 
 from django.db.models import Count, Q
+
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -25,6 +26,7 @@ class IndexView(generic.ListView):
         context['latest_enquete_list'] = Enquete.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
         return context
 
+
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'polls/detail.html'
@@ -35,24 +37,28 @@ class DetailView(generic.DetailView):
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
 
+
 class ResultsView(generic.DetailView):
     model = Enquete
     template_name = 'polls/results.html'
 
+
 def index(request):
     latest_enquete_list = Enquete.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')
     enquete_pending_list, enquete_done_list = [], []
-    if request.user.is_authenticated:
-        for enquete in latest_enquete_list:
-            if enquete.is_done(request.user):
-                enquete_done_list.append(enquete)
-            else:
-                enquete_pending_list.append(enquete)
-    
-    context = {"latest_enquete_list": latest_enquete_list, 
+    if not request.user.is_authenticated:
+        return render(request, "members/login.html")
+    for enquete in latest_enquete_list:
+        if enquete.is_done(request.user):
+            enquete_done_list.append(enquete)
+        else:
+            enquete_pending_list.append(enquete)
+
+    context = {"latest_enquete_list": latest_enquete_list,
                "enquete_pending_list": enquete_pending_list,
                "enquete_done_list": enquete_done_list}
     return render(request, 'polls/index.html', context)
+
 
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -61,9 +67,11 @@ def detail(request, question_id):
         return HttpResponseRedirect(reverse('polls:results', args=(question.enquete.id,)))
     return render(request, 'polls/detail.html', {'question': next_question})
 
+
 def results(request, enquete_id):
     enquete = get_object_or_404(Question, pk=enquete_id)
     return render(request, 'polls/results.html', {'question': enquete})
+
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -77,13 +85,13 @@ def vote(request, question_id):
         })
     else:
         if not request.user.is_authenticated:
-            messages.success(request, ("You can only vote after logging in!"))
+            messages.success(request, "You can only vote after logging in!")
         elif not question.can_user_vote(request.user):
-            messages.success(request, ("Nice try, but you already voted!"))
+            messages.success(request, "Nice try, but you already voted!")
         else:
             vote = Vote(question=question, user=request.user, choice=selected_choice)
             vote.save()
-        
+
         next_question = question.enquete.get_first_relevant_question(request.user)
         if next_question:
             return HttpResponseRedirect(reverse('polls:detail', args=(next_question.id,)))

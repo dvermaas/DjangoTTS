@@ -9,16 +9,18 @@ from django.dispatch import receiver
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 
+
 class Enquete(models.Model):
     text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField("date published", default=timezone.now, help_text="wanneer enquete word weergegeven")
+    pub_date = models.DateTimeField("date published", default=timezone.now,
+                                    help_text="wanneer enquete word weergegeven")
 
     def __str__(self):
         return self.text
 
     def is_done(self, user):
         return self.get_first_relevant_question(user) is None
-        
+
     def was_published_recently(self):
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
@@ -33,13 +35,15 @@ class Enquete(models.Model):
     was_published_recently.boolean = True
     was_published_recently.short_description = 'Published recently?'
 
+
 @receiver(post_save, sender=Enquete)
 def send_mail_to_subs(sender, instance, created, **kwargs):
     if not created:
         return
 
     for user in User.objects.all():
-        html_message = render_to_string('polls/email.html', {'recipient_name': user.username, 'poll_name': instance.text})
+        html_message = render_to_string('polls/email.html',
+                                        {'recipient_name': user.username, 'poll_name': instance.text})
         email = EmailMessage(
             subject="New Poll Available!",
             body=html_message,
@@ -48,6 +52,7 @@ def send_mail_to_subs(sender, instance, created, **kwargs):
         )
         email.content_subtype = 'html'
         email.send()
+
 
 class Question(models.Model):
     text = models.CharField(max_length=200)
@@ -60,13 +65,14 @@ class Question(models.Model):
     def can_user_vote(self, user):
         user_votes = user.vote_set.all()
         qs = user_votes.filter(question=self)
-        return not(qs.exists())
+        return not (qs.exists())
 
     def votes_list(self):
         return [choice.get_vote_count for choice in self.choice_set.all()]
 
     def total_votes(self):
         return sum(self.votes_list())
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -75,9 +81,10 @@ class Choice(models.Model):
     @property
     def get_vote_count(self):
         return self.vote_set.count()
-        
+
     def __str__(self):
         return f"{self.question} | {self.text}"
+
 
 class Vote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
